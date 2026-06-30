@@ -1,80 +1,85 @@
 # Stasis Focus Timer
 
-A tiny desk gadget that keeps you in flow — a Pomodoro-style focus timer built around an Arduino Uno, a 1.8" color TFT, three clicky buttons, and a buzzer. Runs fully offline, no phone needed.
+A little Pomodoro timer for my desk — 25 min of work, 5 min of break — running on an Arduino Uno with a small color screen, three buttons and a buzzer. No phone, no app. Plug in USB and it runs.
+
+I built it because my phone timer kept turning into a "just check one thing" trap. A dumb little box that only does timers fixed that.
 
 ![Focus Timer — finished build](/photo1.png)
 ![Focus Timer — screen running](/photo2.png)
 
-> **Replace the two images above with real photos of YOUR build** — one finished-hardware shot and one close-up of the screen running. The submission check fails if the README has no photos. Put them in a `docs/` folder.
 
-## ⚠️ Display voltage note
-The Arduino Uno drives its SPI pins at **5V**, but many 1.8" ST7735 modules are **3.3V logic**. If your board is not marked 5V-tolerant (no onboard level shifter), put the signal lines (SCK, MOSI, CS, DC, RST) through a logic-level shifter or resistor dividers, and power VCC from 3V3. Feeding 5V into a 3.3V-only panel can damage it.
+## Quick warning about the screen
+
+Some of these 1.8" ST7735 screens only handle 3.3V. If yours isn't marked as 5V tolerant, power its **VCC from the 3V3 pin** (not 5V) — otherwise you can damage it. If you're not sure, 3V3 is the safe choice.
 
 ## What it does
-- 25-minute focus / 5-minute break sessions (Pomodoro)
-- Three dedicated clicky buttons: start/pause, reset, switch mode
-- Big color MM:SS readout on a 1.8" TFT (cyan for focus, green for break)
-- Buzzer chime when a session ends, then auto-rolls into the next block
-- Fully standalone — USB power, no wifi or app
 
-## Bill of materials
-| Part | Qty | ~Price (USD) |
-|------|-----|--------------|
+- 25 min focus / 5 min break sessions
+- Three buttons: start/pause, reset, switch mode
+- Big MM:SS countdown — cyan for focus, green for break
+- Buzzes at the end and rolls into the next block
+- Runs on its own, just needs USB power
+
+## Parts
+
+| Part | Qty | ~Price |
+|------|-----|--------|
 | Arduino Uno (or clone) | 1 | $8.00 |
 | 1.8" ST7735 TFT LCD (128×160, SPI) | 1 | $13.66 |
 | Phantom Blue clicky switches | 10 | $3.07 |
 | Passive piezo buzzer | 1 | $1.00 |
-| Custom 3D-printed enclosure | 1 | ~$2.00 filament |
-| Wires / headers / misc | — | ~$5.13 |
+| 3D-printed case | 1 | ~$2.00 filament |
+| Wires / headers / bits | — | ~$5.13 |
 | **Total** | | **$32.86** |
-
 
 ## Wiring
 
-**Display (hardware SPI)**
-| Uno pin | TFT module |
-|---------|------------|
-| D13 (SCK)  | SCK / CLK |
-| D11 (MOSI) | SDA / MOSI / DIN |
-| D10        | CS |
-| D9         | DC / A0 / RS |
-| D8         | RST / RESET |
-| 3V3        | VCC + LED (backlight) — see voltage note |
-| GND        | GND |
+**Screen**
 
-The module's SD-card pins (if present) are unused.
+| Uno pin | Screen pin |
+|---------|------------|
+| D13 | SCK / CLK |
+| D11 | SDA / MOSI / DIN |
+| D10 | CS |
+| D9  | DC / A0 / RS |
+| D8  | RST |
+| 3V3 | VCC + LED (backlight) |
+| GND | GND |
 
 **Buttons & buzzer**
-| Uno pin | Connects to |
-|---------|-------------|
-| D2 | Button 1 (start / pause) → GND |
+
+| Uno pin | Goes to |
+|---------|---------|
+| D2 | Button 1 (start/pause) → GND |
 | D3 | Button 2 (reset) → GND |
 | D4 | Button 3 (mode) → GND |
 | D5 | Buzzer + (− to GND) |
 
-Buttons use the Uno's internal pull-ups, so each switch just bridges its pin to GND.
+The buttons use the Uno's built-in pull-ups, so each one just connects its pin to GND.
 
-## Firmware
-Written in Arduino C++ (`focus_timer.ino`).
+## Code
 
-1. In Arduino IDE, select board **Arduino Uno** (no extra board package needed).
-2. **Library Manager → install "Adafruit ST7735 and ST7789 Library"** (it pulls in Adafruit GFX).
-3. Put `focus_timer.ino` in a folder named `focus_timer/`, open it, and upload.
+It's all in `focus_timer.ino`.
 
-> If the screen colors look inverted or there's a coloured border, change `INITR_BLACKTAB` in `setup()` to `INITR_GREENTAB` or `INITR_REDTAB` — it depends on your exact ST7735 board batch.
+1. In the Arduino IDE, pick board **Arduino Uno**.
+2. In Library Manager, install **"Adafruit ST7735 and ST7789 Library"** (it grabs Adafruit GFX too).
+3. Put `focus_timer.ino` in a folder called `focus_timer/`, open it, and upload.
+
+> If the colors look off or there's a coloured border, change `INITR_BLACKTAB` in `setup()` to `INITR_GREENTAB` or `INITR_REDTAB`. Depends on your screen batch — mine took some trial and error.
 
 ### Controls
-- **Button 1** — start / pause
-- **Button 2** — reset the current session
-- **Button 3** — toggle between focus and break
+- Button 1 — start / pause
+- Button 2 — reset
+- Button 3 — switch focus/break
 
-## Enclosure / CAD
-Designed in Onshape. Source files live in [`/cad`](cad/) as **STEP** (`.step`) so they stay editable. Printed on FDM at 0.2 mm layer height.
+## Case
 
-## Future improvements
-- Adjustable durations from the buttons
-- Battery power for a fully wireless timer
-- On-screen session counter
+Designed in Onshape, files are in [`/cad`](cad/) as STEP. Printed at 0.2 mm layer height.
+
+## Maybe later
+- Adjustable timer lengths from the buttons
+- Battery so it's wireless
+- A session counter on screen
 
 ## License
 MIT
